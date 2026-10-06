@@ -1,0 +1,32 @@
+/Users/jakubtomiczek/Documents/Studia/MGR/TB/blockchain-lab/zdj_sprawozdanie/output_without_sort_keys.txt
+{
+  "index": 1,
+  "timestamp": 0,
+  "transactions": [],
+  "nonce": 0,
+  "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000"
+}
+hash: 147aed30e21a13f96f72aab4f74ca20fc513b80e10ad6caa74db670786640172
+----------------------------------------------------------------------
+{
+  "index": 2,
+  "timestamp": 1791310097.476749,
+  "transactions": [
+    "Alice -> Bob: 5"
+  ],
+  "nonce": 0,
+  "previous_hash": "147aed30e21a13f96f72aab4f74ca20fc513b80e10ad6caa74db670786640172"
+}
+hash: 366285999895f33df1053b8236c72e34ae0382b3c82995737bd51bc3ec8bde4d
+----------------------------------------------------------------------
+{
+  "index": 3,
+  "timestamp": 1791310172.48416,
+  "transactions": [
+    "Bob -> Carol: 2"
+  ],
+  "nonce": 0,
+  "previous_hash": "366285999895f33df1053b8236c72e34ae0382b3c82995737bd51bc3ec8bde4d"
+}
+hash: d751b544da862b077c829d60e04defbd2bebc9a6099f54364eae73bf28a0c994
+----------------------------------------------------------------------

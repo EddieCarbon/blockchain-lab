@@ -1,0 +1,53 @@
+{
+  "index": 1,
+  "timestamp": 0,
+  "transactions": [],
+  "nonce": 0,
+  "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000"
+}
+hash: 08b341c2db3b45b5fe83dcfe220fef2c1797a9d63c45b637c19390db30d23039
+----------------------------------------------------------------------
+{
+  "index": 2,
+  "timestamp": 1791311923.2772422,
+  "transactions": [
+    "Alice -> Bob: 5"
+  ],
+  "nonce": 0,
+  "previous_hash": "08b341c2db3b45b5fe83dcfe220fef2c1797a9d63c45b637c19390db30d23039"
+}
+hash: 05fafdcb6d36ca41e180eec98cd4aebcbe857c9428ecfde0ed7a907b710c672c
+----------------------------------------------------------------------
+{
+  "index": 3,
+  "timestamp": 1791311927.986327,
+  "transactions": [
+    "Bob -> Carol: 2"
+  ],
+  "nonce": 0,
+  "previous_hash": "05fafdcb6d36ca41e180eec98cd4aebcbe857c9428ecfde0ed7a907b710c672c"
+}
+hash: 6d0719322945c4f997b0969ed6982dc30c7a3966324a8000afce0d553348d86f
+----------------------------------------------------------------------
+{
+  "index": 4,
+  "timestamp": 1791311928.699358,
+  "transactions": [
+    "Bob -> Carol: 3"
+  ],
+  "nonce": 0,
+  "previous_hash": "6d0719322945c4f997b0969ed6982dc30c7a3966324a8000afce0d553348d86f"
+}
+hash: 7993bd2696c87f2bdc1cf998141064e3ddb4bf79e0a17e2db376e4b51c92da86
+----------------------------------------------------------------------
+{
+  "index": 5,
+  "timestamp": 1791311941.999126,
+  "transactions": [
+    "Bob -> Maciek: 6"
+  ],
+  "nonce": 0,
+  "previous_hash": "7993bd2696c87f2bdc1cf998141064e3ddb4bf79e0a17e2db376e4b51c92da86"
+}
+hash: 4884d67bf40161191ad85683e6815ab1a8f338d7e563e9703995395652556f8a
+----------------------------------------------------------------------
