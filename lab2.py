@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 from blockchain import Blockchain
 
-BITCOIN_NETWORK_HASHRATE = 1.07e21  # 1.07 ZH/s;
+BITCOIN_NETWORK_HASHRATE = 1.07e21  # 1.07 ZH/s
 SECONDS_PER_BITCOIN_BLOCK = 600
 SECONDS_PER_YEAR = 60 * 60 * 24 * 365.25
 

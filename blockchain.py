@@ -129,18 +129,30 @@ class Blockchain:
             self.chain[i]["previous_hash"] = self.hash(self.chain[i - 1])
 
 
-if __name__ == "__main__":
-    bc = Blockchain(difficulty=4)
-    bc.mine(miner_address="Alice")
-    bc.new_transaction("Alice", "Bob", 1)
-    bc.new_transaction("Bob", "Carol", 0.5)
-
-    start = time()
-    block = bc.mine(miner_address="miner-1")
+def print_info(block):
     print(
         f"Blok {block['index']} wydobyty w {time() - start:.8f} s, "
         f"nonce={block['nonce']}"
     )
     print("hash:", bc.hash(block))
     print("Łańcuch poprawny:", bc.valid_chain(bc.chain))
-    print("-----------------------------------------")
+    print()
+
+
+if __name__ == "__main__":
+    bc = Blockchain(difficulty=4)
+
+    start = time()
+
+    block1 = bc.mine(miner_address="Alice")
+    print_info(block1)
+    bc.new_transaction("Alice", "Bob", 1)
+    bc.new_transaction("Bob", "Carol", 0.5)
+
+    block2 = bc.mine(miner_address="Kuba")
+    print_info(block2)
+
+    bc.new_transaction("Kuba", "Jakub", 0.7)
+    bc.new_transaction("Jakub", "Michal", 0.6)
+    block3 = bc.mine(miner_address="Michal")
+    print_info(block3)
