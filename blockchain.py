@@ -13,7 +13,6 @@ class Blockchain:
 
     @staticmethod
     def hash(block):
-        # sort_keys=True gwarantuje deterministyczną kolejność pól
         block_string = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
 
@@ -124,10 +123,6 @@ class Blockchain:
 
         return True, None
 
-    def repair_as_attacker(self, start):
-        for i in range(start + 1, len(self.chain)):
-            self.chain[i]["previous_hash"] = self.hash(self.chain[i - 1])
-
 
 def print_info(block):
     print(
@@ -156,3 +151,9 @@ if __name__ == "__main__":
     bc.new_transaction("Jakub", "Michal", 0.6)
     block3 = bc.mine(miner_address="Michal")
     print_info(block3)
+    print("Saldo Michal:", bc.get_balance("Michal"))
+
+    bc.new_transaction("Jakub", "Karol", 10)
+    bc.new_transaction("Jakub", "", 10)
+    bc.new_transaction("Jakub", "Karol", -0.1)
+    bc.new_transaction("Jakub", "Jakub", 0.1)

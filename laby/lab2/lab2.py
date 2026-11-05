@@ -183,21 +183,15 @@ def remine_from_block(blockchain, start_block_index=2):
 
 
 def run_integrity_attack(total_blocks=5):
-    print("2.3. Atak na integralność łańcucha")
-    print(
-        f"Tworzę łańcuch złożony z {total_blocks} bloków dla trudności 4, "
-        "zmieniam transakcję w bloku nr 2 i sprawdzam valid_chain()."
-    )
-
     blockchain = mine_chain(difficulty=4, total_blocks=total_blocks)
     print(
-        f"Łańcuch poprawny przed modyfikacją: {blockchain.valid_chain(blockchain.chain)}"
+        f"valid_chain() przed modyfikacją: {blockchain.valid_chain(blockchain.chain)}"
     )
 
     old_amount, new_amount = change_transaction_amount(blockchain, block_index=2)
-    print(f"Zmieniono kwotę transakcji w bloku nr 2: {old_amount} -> {new_amount}")
+    print(f"Zmiana kwoty transakcji w bloku nr 2: {old_amount} -> {new_amount}")
     print(
-        f"Łańcuch poprawny po modyfikacji: {blockchain.valid_chain(blockchain.chain)}"
+        f"valid_chain po modyfikacji: {blockchain.valid_chain(blockchain.chain)}"
     )
 
     print("\nPomiar czasu ataku — ponowne kopanie od bloku nr 2:")
@@ -222,8 +216,8 @@ def run_integrity_attack(total_blocks=5):
 
 
 def main():
-    output_dir = Path(__file__).resolve().parent
-    run_difficulty(output_dir=output_dir)
+    # output_dir = Path(__file__).resolve().parent
+    # run_difficulty(output_dir=output_dir)
     run_integrity_attack()
 
 
