@@ -16,15 +16,43 @@ class Blockchain:
         block_string = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
 
+    @staticmethod
+    def hash_transaction(transaction):
+        tx_string = json.dumps(transaction, sort_keys=True).encode()
+        return hashlib.sha256(tx_string).hexdigest()
+
+    @classmethod
+    def compute_merkle_root(cls, transactions):
+        if not transactions:
+            return "0" * 64
+
+        current_level = [cls.hash_transaction(tx) for tx in transactions]
+
+        while len(current_level) > 1:
+            if len(current_level) % 2 != 0:
+                current_level.append(current_level[-1])
+
+            next_level = []
+            for i in range(0, len(current_level), 2):
+                combined = current_level[i] + current_level[i + 1]
+                new_hash = hashlib.sha256(combined.encode()).hexdigest()
+                next_level.append(new_hash)
+
+            current_level = next_level
+
+        return current_level[0]
+
     @property
     def last_block(self):
         return self.chain[-1]
 
     def create_genesis_block(self):
+        transactions = []
         genesis = {
             "index": 1,
             "timestamp": 0,
             "transactions": [],
+            "merkle_root": self.compute_merkle_root(transactions),
             "nonce": 0,
             "previous_hash": "0" * 64,
         }
@@ -86,12 +114,14 @@ class Blockchain:
         return computed_hash
 
     def mine(self, miner_address):
-        # Transakcja coinbase (nagroda dla górnika) jako pierwsza w bloku
         reward = {"sender": "0", "recipient": miner_address, "amount": 1}
+        block_transactions = [reward] + self.current_transactions
+
         block = {
             "index": len(self.chain) + 1,
             "timestamp": time(),
             "transactions": [reward] + self.current_transactions,
+            "merkle_root": self.compute_merkle_root(block_transactions),
             "nonce": 0,
             "previous_hash": self.hash(self.last_block),
         }
@@ -109,6 +139,10 @@ class Blockchain:
             previous, block = chain[i - 1], chain[i]
             if block["previous_hash"] != self.hash(previous):
                 return False
+            if block.get("merkle_root") != self.compute_merkle_root(
+                block["transactions"]
+            ):
+                return False
             if not self.hash(block).startswith("0" * self.difficulty):
                 return False
 
@@ -120,6 +154,10 @@ class Blockchain:
             previous_block = chain[i - 1]
             if current_block["previous_hash"] != self.hash(previous_block):
                 return False, i + 1
+            if current_block.get("merkle_root") != self.compute_merkle_root(
+                current_block["transactions"]
+            ):
+                return False, i + 1
 
         return True, None
 
@@ -130,6 +168,7 @@ def print_info(block):
         f"nonce={block['nonce']}"
     )
     print("hash:", bc.hash(block))
+    print("merkle_root:", block["merkle_root"])
     print("Łańcuch poprawny:", bc.valid_chain(bc.chain))
     print()
 
