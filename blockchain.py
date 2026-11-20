@@ -3,6 +3,8 @@ import json
 import math
 from time import time
 
+MAX_TRANSACTION_AMOUNT = 10**12
+
 
 class Blockchain:
     def __init__(self, difficulty=4):
@@ -104,7 +106,7 @@ class Blockchain:
         genesis = {
             "index": 1,
             "timestamp": 0,
-            "transactions": [],
+            "transactions": transactions,
             "merkle_root": self.compute_merkle_root(transactions),
             "nonce": 0,
             "previous_hash": "0" * 64,
@@ -129,20 +131,51 @@ class Blockchain:
 
         return balance
 
-    def new_transaction(self, sender, recipient, amount):
+    @staticmethod
+    def validate_transaction_payload(values):
+        if not isinstance(values, dict):
+            raise TypeError("Dane transakcji muszą być obiektem JSON")
+
+        required = {"sender", "recipient", "amount"}
+        missing = required - set(values.keys())
+        extra = set(values.keys()) - required
+
+        if missing:
+            raise ValueError(f"Brak wymaganych pól: {', '.join(sorted(missing))}")
+        if extra:
+            raise ValueError(f"Niedozwolone dodatkowe pola: {', '.join(sorted(extra))}")
+
+        sender = values["sender"]
+        recipient = values["recipient"]
+        amount = values["amount"]
+
         if not isinstance(sender, str) or not sender.strip():
-            raise ValueError("Nadawca musi być niepustym ciągiem znaków")
+            raise ValueError("Nadawca (sender) musi być niepustym ciągiem znaków")
         if not isinstance(recipient, str) or not recipient.strip():
-            raise ValueError("Odbiorca musi być niepustym ciągiem znaków")
+            raise ValueError("Odbiorca (recipient) musi być niepustym ciągiem znaków")
         if sender == recipient:
             raise ValueError("Nadawca i odbiorca nie mogą być tacy sami")
+
         if (
             not isinstance(amount, (int, float))
             or isinstance(amount, bool)
             or not math.isfinite(amount)
             or amount <= 0
         ):
-            raise ValueError("Kwota musi być dodatnią liczbą")
+            raise ValueError("Kwota (amount) musi być dodatnią liczbą skończoną")
+
+        if amount > MAX_TRANSACTION_AMOUNT:
+            raise ValueError(
+                f"Kwota przekracza dozwolony limit ({MAX_TRANSACTION_AMOUNT})"
+            )
+
+        return sender.strip(), recipient.strip(), amount
+
+    def new_transaction(self, sender, recipient, amount):
+        sender, recipient, amount = self.validate_transaction_payload(
+            {"sender": sender, "recipient": recipient, "amount": amount}
+        )
+
         if self.get_balance(sender) < amount:
             raise ValueError("Nadawca nie ma wystarczających środków")
 
@@ -173,7 +206,7 @@ class Blockchain:
         block = {
             "index": len(self.chain) + 1,
             "timestamp": time(),
-            "transactions": [reward] + self.current_transactions,
+            "transactions": block_transactions,
             "merkle_root": self.compute_merkle_root(block_transactions),
             "nonce": 0,
             "previous_hash": self.hash(self.last_block),
@@ -185,7 +218,7 @@ class Blockchain:
         return block
 
     def valid_chain(self, chain):
-        if chain[0] != self.chain[0]:
+        if not chain or chain[0] != self.chain[0]:
             return False
 
         for i in range(1, len(chain)):
@@ -213,62 +246,3 @@ class Blockchain:
                 return False, i + 1
 
         return True, None
-
-
-def print_info(block):
-    print(
-        f"Blok {block['index']} wydobyty w {time() - start:.8f} s, "
-        f"nonce={block['nonce']}"
-    )
-    print("hash:", bc.hash(block))
-    print("merkle_root:", block["merkle_root"])
-    print("Łańcuch poprawny:", bc.valid_chain(bc.chain))
-    print()
-
-
-if __name__ == "__main__":
-    bc = Blockchain(difficulty=4)
-
-    start = time()
-
-    block1 = bc.mine(miner_address="Alice")
-    print_info(block1)
-    bc.new_transaction("Alice", "Bob", 1)
-    bc.new_transaction("Bob", "Carol", 0.5)
-
-    block2 = bc.mine(miner_address="Kuba")
-    print_info(block2)
-
-    bc.new_transaction("Kuba", "Jakub", 0.7)
-    bc.new_transaction("Jakub", "Michal", 0.6)
-    block3 = bc.mine(miner_address="Michal")
-    print_info(block3)
-    print("Saldo Michal:", bc.get_balance("Michal"))
-
-    print("\n--- SPRAWDZENIE MERKLE TREE ---")
-
-    recomputed_root = Blockchain.compute_merkle_root(block2["transactions"])
-    print(
-        "Merkle root zgodny z transakcjami block2:",
-        recomputed_root == block2["merkle_root"],
-    )
-
-    tx_in_block2 = {"sender": "Alice", "recipient": "Bob", "amount": 1}
-    proof = Blockchain.get_merkle_proof(block2, tx_in_block2)
-    print("Liczba transakcji w block2:", len(block2["transactions"]))
-    print("Liczba hashy w dowodzie Merkle (proof):", len(proof))
-
-    is_valid_tx = Blockchain.verify_merkle_proof(
-        tx_in_block2, proof, block2["merkle_root"]
-    )
-    print("Czy transakcja Alice -> Bob (1) jest w block2?:", is_valid_tx)
-
-    fake_tx = {"sender": "Alice", "recipient": "Bob", "amount": 999}
-    is_fake_valid = Blockchain.verify_merkle_proof(
-        fake_tx, proof, block2["merkle_root"]
-    )
-    print("Czy zmieniona transakcja (999) przejdzie weryfikację?:", is_fake_valid)
-
-    tx_from_block3 = {"sender": "Kuba", "recipient": "Jakub", "amount": 0.7}
-    proof_wrong_block = Blockchain.get_merkle_proof(block2, tx_from_block3)
-    print("Dowód dla transakcji z innego bloku:", proof_wrong_block)
